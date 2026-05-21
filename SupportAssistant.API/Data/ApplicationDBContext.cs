@@ -12,4 +12,15 @@ public class ApplicationDbContext : DbContext
 
     public DbSet<User> Users => Set<User>();
     public DbSet<ChatMessage> ChatMessages => Set<ChatMessage>();
+    public DbSet<Conversation> Conversations { get; set; }
+    protected override void OnModelCreating( ModelBuilder modelBuilder)
+    {
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<ChatMessage>()
+            .HasOne(x => x.Conversation)
+            .WithMany(x => x.Messages)
+            .HasForeignKey(x => x.ConversationId)
+            .OnDelete(DeleteBehavior.NoAction);
+    }
 }

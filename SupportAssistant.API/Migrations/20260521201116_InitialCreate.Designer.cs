@@ -12,8 +12,8 @@ using SupportAssistant.API.Data;
 namespace SupportAssistant.API.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    [Migration("20260519194705_AddChatMessages")]
-    partial class AddChatMessages
+    [Migration("20260521201116_InitialCreate")]
+    partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -37,6 +37,9 @@ namespace SupportAssistant.API.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<int>("ConversationId")
+                        .HasColumnType("int");
+
                     b.Property<DateTime>("CreatedAt")
                         .HasColumnType("datetime2");
 
@@ -49,9 +52,36 @@ namespace SupportAssistant.API.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("ConversationId");
+
                     b.HasIndex("UserId");
 
                     b.ToTable("ChatMessages");
+                });
+
+            modelBuilder.Entity("SupportAssistant.API.Models.Conversation", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("Title")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId");
+
+                    b.ToTable("Conversations");
                 });
 
             modelBuilder.Entity("SupportAssistant.API.Models.User", b =>
@@ -84,13 +114,37 @@ namespace SupportAssistant.API.Migrations
 
             modelBuilder.Entity("SupportAssistant.API.Models.ChatMessage", b =>
                 {
+                    b.HasOne("SupportAssistant.API.Models.Conversation", "Conversation")
+                        .WithMany("Messages")
+                        .HasForeignKey("ConversationId")
+                        .OnDelete(DeleteBehavior.NoAction)
+                        .IsRequired();
+
                     b.HasOne("SupportAssistant.API.Models.User", "User")
                         .WithMany("ChatMessages")
                         .HasForeignKey("UserId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.Navigation("Conversation");
+
                     b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SupportAssistant.API.Models.Conversation", b =>
+                {
+                    b.HasOne("SupportAssistant.API.Models.User", "User")
+                        .WithMany()
+                        .HasForeignKey("UserId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("User");
+                });
+
+            modelBuilder.Entity("SupportAssistant.API.Models.Conversation", b =>
+                {
+                    b.Navigation("Messages");
                 });
 
             modelBuilder.Entity("SupportAssistant.API.Models.User", b =>

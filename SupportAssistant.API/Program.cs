@@ -94,7 +94,8 @@ builder.Services.AddAuthentication(options =>
             Encoding.UTF8.GetBytes(builder.Configuration["Jwt:Key"]!))
     };
 });
-builder.Services.AddHttpClient<GeminiService>();
+//builder.Services.AddHttpClient<GeminiService>();
+builder.Services.AddHttpClient<GroqService>();
 
 //builder.Services.AddScoped<GeminiService>();
 
